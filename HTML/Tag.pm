@@ -23,11 +23,14 @@ sub build_cloud {
     my $height      = shift // 50;
     my $width       = shift // 50;
     my $sort_method = shift // 'ascii'; # allows sorting by 'ascii' or 'value'
-    my $min_count   = shift // 1;
+    my $min_count   = shift // 0;
     my $html;
 
     ## need to cull entries with less than $min_count
-	
+	my @keepers = grep { $tags{$_}{count} > $min_count; } keys %tags;
+	foreach (keys %tags) {
+		delete $tags{$_} unless @keepers ~~ /$_/;
+	}
 
 	my @ordered = sort { $tags{$a}{count} <=> $tags{$b}{count} } keys %tags;
 	my $high = $tags{$ordered[-1]}{count};
