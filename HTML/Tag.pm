@@ -9,8 +9,12 @@ our @ISA = qw(Exporter);
 our @EXPORT    = qw();
 our @EXPORT_OK = qw(build_cloud);
 
+## TODO
+# need to add the reverse sorting mechanisms
+# write README / POD documentation
+# come up with good way to test this output
+
 $HTML::Tag::Font_Family = 'monospace';
-#@HTML::Tag::Font_Sizes = (5, 7, 9, 11, 13);
 @HTML::Tag::Font_Sizes = ('70%', '85%', '100%', '115%', '130%'); # hmm..
 
 ## generalized routines for generating HTML tag clouds
@@ -19,10 +23,10 @@ sub build_cloud {
     # build_cloud(\%hash, $base_url, $height, $width, [$sort_method], [$min_count]) -- returns an HTML string for a tag 'cloud'
     my $href        = shift;
     my %tags        = %{$href};
-	my $base_url    = shift;
+    my $base_url    = shift;
     my $height      = shift // 50;
     my $width       = shift // 50;
-    my $sort_method = shift // 'ascii'; # allows sorting by 'ascii' or 'value'
+    my $sort_method = shift // 'ascii'; # allows sorting by 'ascii' or 'value' (can also prefix either with 'reverse-')
     my $min_count   = shift // 0;
     my $html;
 
@@ -72,7 +76,7 @@ sub build_cloud {
 			my $link = $tag{link_rel};
 			my $alt  = $count;
 			
-			warn "WARN:: '<base>' specified in '$key', but no '_base' spec in incoming hash" unless $base_url;
+			warn "WARN:: '<base>' specified in '$key', but no 'base' spec in build_cloud() call" unless $base_url;
 			$link =~ s/<base>/$base_url/;
 			$link =~ s/<value>/$count/g;
 			$link =~ s/<key>/$key/g;
