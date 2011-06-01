@@ -27,15 +27,10 @@ my $out;
     baz => {
         count => 5,
         link_rel => '<base>?value=<value>',
-    },
-    '_internal' => {
-        'base' => 'http://foo.com/foo.php',
-        'count' => 0, # hacky
-    },
-    
+    },    
 );
 
-$out = HTML::Tag::build_cloud(\%in, 50, 50, 0);
+$out = HTML::Tag::build_cloud(\%in, 'http://foo.com/foo.php', 50, 50, 0);
 
 is (defined $out, 1, "some content was returned:: $out");
 #is_valid_markup($out);
@@ -61,14 +56,10 @@ is (defined $out, 1, "some content was returned:: $out");
         count => 84,
         link_rel => '<base>?value=<value>',
     },
-    '_internal' => {
-        'base' => 'http://foo.com/foo.php',
-        'count' => 0, # hacky
-    },
     
 );
 
-$out = HTML::Tag::build_cloud(\%in, 100, 100, 0);
+$out = HTML::Tag::build_cloud(\%in, 'http://foo.com/foo.php', 100, 100, 0);
 
 is (defined $out, 1, "some content was returned:: $out");
 
