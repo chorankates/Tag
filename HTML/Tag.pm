@@ -9,17 +9,17 @@ our @ISA = qw(Exporter);
 our @EXPORT    = qw();
 our @EXPORT_OK = qw(build_cloud);
 
-
-$HTML::Tag::Font_Default = 'Tahoma';
+$HTML::Tag::Font_Family = 'monospace';
 #@HTML::Tag::Font_Sizes = (5, 7, 9, 11, 13);
 @HTML::Tag::Font_Sizes = ('70%', '85%', '100%', '115%', '130%'); # hmm..
 
 ## generalized routines for generating HTML tag clouds
 
 sub build_cloud {
-    # build_cloud(\%hash, $height, $width, [$sort_method], [$min_count]) -- returns an HTML string for a tag 'cloud'
+    # build_cloud(\%hash, $base_url, $height, $width, [$sort_method], [$min_count]) -- returns an HTML string for a tag 'cloud'
     my $href        = shift;
     my %tags        = %{$href};
+	my $base_url    = shift;
     my $height      = shift // 50;
     my $width       = shift // 50;
     my $sort_method = shift // 'ascii'; # allows sorting by 'ascii' or 'value'
@@ -34,7 +34,6 @@ sub build_cloud {
 	my $range = ($high / $#HTML::Tag::Font_Sizes);
 	
 	foreach my $tag (keys %tags) { 
-		next if $tag =~ /^_/; # skipping internals
 		my $count = $tags{$tag}{count};
 
 		my $size = ($count < ($range)) ? $HTML::Tag::Font_Sizes[0] :
@@ -59,32 +58,30 @@ sub build_cloud {
     }
 
     for (my $i = 0; $i <= $#keys; $i++) { 
-		next if $keys[$i] =~ /^_/i; # skipping internal settings
 		my $lhtml;
 		my $key = $keys[$i];
 		my %tag = %{$tags{$key}}; # need to have some error checking here
 		my $size = $tag{size};
 		my $count = $tag{count};
-		my $base = $tags{_internal}{base};
 	
 		my $link;
 		if (defined $tag{link_rel}) {
 			my $link = $tag{link_rel};
 			my $alt  = $count;
 			
-			warn "WARN:: '<base>' specified in '$key', but no '_base' spec in incoming hash" unless $base;
-			$link =~ s/<base>/$base/;
+			warn "WARN:: '<base>' specified in '$key', but no '_base' spec in incoming hash" unless $base_url;
+			$link =~ s/<base>/$base_url/;
 			$link =~ s/<value>/$count/g;
 			$link =~ s/<key>/$key/g;
 	
 	
-			$lhtml = "<a href=\"$link\" title=\"$count\"><span style=\"font-size: $size;\">$key</span></a>";
+			$lhtml = "<a href=\"$link\" title=\"$count\"><span style=\"font-face: $HTML::Tag::Font_Family; font-size: $size;\">$key</span></a>";
 	
 		} elsif (defined $tag{link_abs}) { 
 			my $link = $tag{link_abs};
 			my $alt  = $count;
 	
-			$lhtml = "<a href=$link title=$alt><span style='font-size: $size'>$key</span></a>";
+			$lhtml = "<a href=$link title=$alt><span style='font-face: $HTML::Tag::Font_Family; font-size: $size'>$key</span></a>";
 	
 		} else  {
 			warn "WARN:: no 'link_abs' or 'link_rel' specified for '$key'";
