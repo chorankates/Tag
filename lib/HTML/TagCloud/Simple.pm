@@ -1,4 +1,4 @@
-package HTML::Tag;
+package HTML::TagCloud::Simple;
 use strict;
 use warnings;
 
@@ -9,11 +9,10 @@ our @ISA = qw(Exporter);
 our @EXPORT    = qw();
 our @EXPORT_OK = qw(build_cloud);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 ## TODO
 # need to add the reverse sorting mechanisms
-# write README / POD documentation
 # come up with good way to test this output
 
 $HTML::Tag::Font_Family = 'monospace';
@@ -55,7 +54,7 @@ sub build_cloud {
 	}
 
     ## build the initial HTML
-    my $id = 'tag_cloud_' . rand(10000);
+    my $id = 'tag_cloud_1';
     $html = "<div id=\"$id\" style=\"display: inline; border-style: solid; border-width: 1px; border-color: #000000; position: absolute; height: $height; width: $width;\">";
 
     ## iterate keys according to sort
