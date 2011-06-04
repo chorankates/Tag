@@ -1,5 +1,6 @@
 #!/usr/bin/perl -w
 ## basic.t -- initial TDD work for HTML::Tag
+# definitely need better/more tests, just not sure how I want to test <-- HTML::TagCloud has a good set of tests
 
 use strict;
 use warnings;
@@ -31,9 +32,7 @@ my $out;
 );
 
 $out = HTML::Tag::build_cloud(\%in, 'http://foo.com/foo.php', 50, 50, 0);
-
-is (defined $out, 1, "some content was returned:: $out");
-#is_valid_markup($out);
+is (defined $out, 1, "some content was returned");
 
 %in = (
     foo => {
@@ -51,7 +50,7 @@ is (defined $out, 1, "some content was returned:: $out");
 );
 
 $out = HTML::Tag::build_cloud(\%in, 'http://foo.com/foo.php', 50, 50, 0, 10);
-is (defined $out, 1, "some content was returned:: $out");
+is (defined $out, 1, "some content was returned");
 
 %in = (
     one => {
@@ -79,7 +78,7 @@ is (defined $out, 1, "some content was returned:: $out");
 
 $out = HTML::Tag::build_cloud(\%in, 'http://foo.com/foo.php', 100, 100, 0);
 
-is (defined $out, 1, "some content was returned:: $out");
+is (defined $out, 1, "some content was returned");
 
 ## build a 100 element hash
 %in = ( '_internal' => { 'base' => 'http://bar.com/bar.php', count => 0 } );
@@ -90,7 +89,6 @@ for (my $i = 0; $i < 100; $i++) {
 }
 
 $out = HTML::Tag::build_cloud(\%in, 'http://foo.com/foo.php', 200, 200, 0);
-
-is (defined $out, 1, "some content was returned:: $out");
+is (defined $out, 1, "some content was returned");
 
 exit;
