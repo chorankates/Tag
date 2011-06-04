@@ -9,7 +9,7 @@ our @ISA = qw(Exporter);
 our @EXPORT    = qw();
 our @EXPORT_OK = qw(build_cloud);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 ## TODO
 # need to add the reverse sorting mechanisms
