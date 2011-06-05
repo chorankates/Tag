@@ -12,11 +12,20 @@ our @EXPORT_OK = qw(build_cloud);
 our $VERSION = '0.03';
 
 ## TODO
-# need to add the reverse sorting mechanisms
+
 # come up with good way to test this output
 
-$HTML::Tag::Font_Family = 'monospace';
-@HTML::Tag::Font_Sizes = ('70%', '85%', '100%', '115%', '130%'); # hmm..
+#$HTML::Tag::Font_Family = 'monospace';
+#@HTML::Tag::Font_Sizes = ('70%', '85%', '100%', '115%', '130%'); # hmm..
+
+%HTML::TagCloud::Simple::settings = (
+    font => {
+	family => 'monospace',
+	color  => 'black',
+	sizes  => ['70%', '85%', '100%', '115%', '130%'],
+    },
+
+    );
 
 ## generalized routines for generating HTML tag clouds
 
@@ -39,16 +48,16 @@ sub build_cloud {
 
 	my @ordered = sort { $tags{$a}{count} <=> $tags{$b}{count} } keys %tags;
 	my $high = $tags{$ordered[-1]}{count};
-	my $range = ($high / $#HTML::Tag::Font_Sizes);
+	my $range = ($high / $#{$HTML::TagCloud::Simple::settings{font}{sizes}});
 	
 	foreach my $tag (keys %tags) { 
 		my $count = $tags{$tag}{count};
 
-		my $size = ($count < ($range)) ? $HTML::Tag::Font_Sizes[0] :
-				   ($count < ($range * 2)) ? $HTML::Tag::Font_Sizes[1] :
-				   ($count < ($range * 3)) ? $HTML::Tag::Font_Sizes[2] :
-				   ($count < ($range * 4)) ? $HTML::Tag::Font_Sizes[3] :
-																	$HTML::Tag::Font_Sizes[-1]; # default
+		my $size = ($count < $range) ? $HTML::TagCloud::Simple::settings{font}{size}[0] :
+				   ($count < ($range * 2)) ? $HTML::TagCloud::Simple::settings{font}{size}[1] :
+				   ($count < ($range * 3)) ? $HTML::TagCloud::Simple::settings{font}{size}[2] :
+				   ($count < ($range * 4)) ? $HTML::TagCloud::Simple::settings{font}[size}[3] :
+				   $HTML::TagCloud::Simple::settings{font}{size}[-1]; # default
 		$tags{$tag}{size} = $size;
 
 	}
@@ -61,8 +70,10 @@ sub build_cloud {
     my @keys;
     if ($sort_method =~ /value/i) { 
 		@keys = sort { $tags{$a}{count} <=> $tags{$b}{count} } keys %tags;
+		@keys = reverse @keys if $sort_method =~ /reverse-/;
     } else {
 		@keys = sort { $a cmp $b } keys %tags;
+		@keys = reverse @keys if $sort_method =~ /reverse-/;
     }
 
     for (my $i = 0; $i <= $#keys; $i++) { 
@@ -83,13 +94,13 @@ sub build_cloud {
 			$link =~ s/<key>/$key/g;
 	
 	
-			$lhtml = "<a href=\"$link\" title=\"$count\"><span style=\"font-face: $HTML::Tag::Font_Family; font-size: $size;\">$key</span></a>";
+			$lhtml = "<a href=\"$link\" title=\"$count\"><span style=\"font-face: $HTML::TagCloud::Simple::settings{font}{family}; font-size: $size; font-color: $HTML::TagCloud::Simple::settings{font}{color}\">$key</span></a>";
 	
 		} elsif (defined $tag{link_abs}) { 
 			my $link = $tag{link_abs};
 			my $alt  = $count;
 	
-			$lhtml = "<a href=$link title=$alt><span style='font-face: $HTML::Tag::Font_Family; font-size: $size'>$key</span></a>";
+			$lhtml = "<a href=$link title=$alt><span style='font-face: $HTML::TagCloud::Simple::settings{font}{family}; font-size: $size; font-color: $HTML::TagCloud::Simple::settings{font}{color};'>$key</span></a>";
 	
 		} else  {
 			warn "WARN:: no 'link_abs' or 'link_rel' specified for '$key'";
@@ -124,11 +135,11 @@ __END__
 
     use HTML::TagCloud::Simple;
 
-my %h = ( foo => { count => 5, link_rel => '?count=<count>&value=<value>' }, bar => { count => 5, link_abs => 'http://bar.com' } );
+    my %h = ( foo => { count => 5, link_rel => '?count=<count>&value=<value>' }, bar => { count => 5, link_abs => 'http://bar.com' } );
 
-my $html = HTML::TagCloud::Simple::build_cloud(\%h, 'http://baz.com/foo.php', 100, 100);
+    my $html = HTML::TagCloud::Simple::build_cloud(\%h, 'http://baz.com/foo.php', 100, 100);
 
-...
+    ...
 
     For more examples, see t/*.t
 
@@ -140,9 +151,9 @@ my $html = HTML::TagCloud::Simple::build_cloud(\%h, 'http://baz.com/foo.php', 10
      build_cloud(\%hash, $base_url, $height, $width, [$sort_method], [$min_count]) -- returns an HTML string
 
      $height/$width - because this function returns a <div> with the tag inside, it needs to know how big to make the <div>
-    $base_url- will be concatenated to to $hash{link_rel} to create an FQDN
+     $base_url      - will be concatenated to to $hash{link_rel} to create an FQDN
      $sort_method   - can be 'ascii', 'value', 'reverse-ascii' or 'reverse-value'
-    $min_count     - if $hash{count} < this, the link will not be included in the tag
+     $min_count     - if $hash{count} < this, the link will not be included in the tag
 
 =head1 AUTHOR
 
